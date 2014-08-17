@@ -13,7 +13,7 @@
     ],
     "repository": {
         "type": "git",
-        "url" : "git@gitlab.alibaba-inc.com:clam/feloader.git"
+        "url" : "https://github.com/Clamjs/feloader.git"
     },
     "author": "limingv5",
     "license": "ISC"
