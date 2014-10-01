@@ -1,7 +1,7 @@
 {
     "name": "feloader",
-    "version": "0.0.10",
-    "description": "Complete layout, and put JavaScript & CSS into the right place.",
+    "version": "0.1.0",
+    "description": "Dynamic JavaScript & CSS",
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
@@ -14,6 +14,14 @@
     "repository": {
         "type": "git",
         "url" : "https://github.com/Clamjs/feloader.git"
+    },
+    "dependencies" :{
+        "iconv-lite": "~0.2.5",
+        "is-utf8": "~0.2.0",
+        "juicer":"0.6.5-stable-p2",
+        "less":"~1.7.5",
+        "node-sass":"~0.9.3",
+        "debug.log": "^0.0.3"
     },
     "author": "limingv5",
     "license": "ISC"

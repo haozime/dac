@@ -1,95 +1,196 @@
-function _Feloader(flag, head, tail) {
-    this.flag = flag || "fe-move";
-    this.head = head || "head";
-    this.tail = tail || "tail";
-    this.content = '';
+var juicer = require('juicer'),
+    fs = require('fs'),
+    delog = require("debug.log"),
+    sass = require('node-sass'),
+    less = require('less'),
+    isUtf8 = require('is-utf8'),
+    iconv = require('iconv-lite');
+
+var method_body = [
+    "var __escapehtml = {",
+    "escapehash: {",
+    "'<': '&lt;',",
+    "'>': '&gt;',",
+    "'&': '&amp;',",
+    "'\"': '&quot;',",
+    "\"'\": '&#x27;',",
+    "'/': '&#x2f;'",
+    "},",
+    "escapereplace: function(k) {",
+    "return __escapehtml.escapehash[k];",
+    "},",
+    "escaping: function(str) {",
+    "return typeof(str) !== 'string' ? str : str.replace(/[&<>\"]/igm, this.escapereplace);",
+    "},",
+    "detection: function(data) {",
+    "return typeof(data) === 'undefined' ? '' : data;",
+    "}",
+    "};",
+
+    "var __throw = function(error) {",
+    "if(typeof(console) !== 'undefined') {",
+    "if(console.warn) {",
+    "console.warn(error);",
+    "return;",
+    "}",
+
+    "if(console.log) {",
+    "console.log(error);",
+    "return;",
+    "}",
+    "}",
+
+    "throw(error);",
+    "};",
+
+    "_method = _method || {};",
+    "_method.__escapehtml = __escapehtml;",
+    "_method.__throw = __throw;"
+].join('');
+
+function cosoleResp(type, c) {
+    c += " [" + type + ']';
+
+    switch (type) {
+        case "Need":
+            delog.request(c);
+            break;
+        case "Compile":
+        case "Embed":
+            delog.process(c);
+            break;
+        case "Disable":
+            c = "<= " + c;
+        case "Error":
+            delog.error(c);
+            break;
+        case "Local":
+        case "Remote":
+        case "Cache":
+            delog.response(c);
+            console.log('');
+            break;
+        case "Actually":
+        default:
+            delog.log(c);
+    }
 }
-_Feloader.prototype = {
-    constructor : _Feloader,
-    input: function(content) {
-        this.content = content.replace(/\<\!\-\-^#.*\-\-\>/g, '');
 
-        if (!this.content.match(/<body[^>]*?>([\s\S]*?)<\/body>/gi)) {
-            this.content = "<body>\n"+this.content+"\n</body>";
+function lessCompiler(xcssfile, absPath) {
+    var lesstxt = fs.readFileSync(xcssfile);
+
+    lesstxt = lesstxt.replace(/\@import\s+["'](.+)["']\;/g, function (t, basename) {
+        var filepath = path.join(path.dirname(xcssfile), basename);
+        if (!/\.[a-z]{1,}$/i.test(filepath)) {
+            filepath += ".less";
         }
 
-        if (!this.content.match(/<head[^>]*?>([\s\S]*?)<\/head>/gi)) {
-            this.content = "<head>\n</head>\n"+this.content;
+        if (fs.existsSync(filepath)) {
+            cosoleResp("Embed", filepath);
+            return convert(fs.readFileSync(filepath));
+        }
+        else {
+            return '';
+        }
+    });
+
+    cosoleResp("Compile", xcssfile);
+
+    var content = new (less.Parser)({processImports: false})
+        .parse(lesstxt, function (e, tree) {
+            cosoleResp("Local", absPath ? absPath : xcssfile);
+            return tree.toCSS();
+        });
+
+    return content + "\n";
+}
+
+function scssCompiler(xcssfile, absPath) {
+    cosoleResp("Compiling", xcssfile);
+
+    var content = sass.renderSync({
+        file: xcssfile,
+        success: function (css, map) {
+            cosoleResp("Local", absPath ? absPath : xcssfile);
+        }
+    });
+
+    return content + "\n";
+}
+
+function convert(buff) {
+    return iconv.decode(buff, isUtf8(buff) ? 'utf8' : 'gbk');
+}
+
+exports.jstpl = function(absPath, revPath, namespace, anon) {
+    namespace = namespace || '';
+    anon = anon ? true : false;
+
+    // 前后端模板一致化，如果是*.html.js格式的请求，则编译*.html为juicer的function格式返回
+    if (/\.html\.js$/i.test(absPath)) {
+        var htmlName = absPath.replace(/\.js$/, '');
+        try {
+            var compiled = juicer(convert(fs.readFileSync(htmlName)))._render.toString().replace(/^function anonymous[^{]*?{([\s\S]*?)}$/igm, function ($, fn_body) {
+                return 'function(_, _method) {' + method_body + fn_body + '};\n';
+            });
+        }
+        catch (e) {
+            cosoleResp('Error', 'Compile failed with error ' + e.message);
+            return '';
         }
 
-        if (!this.content.match(/<html[^>]*?>([\s\S]*?)<\/html>/gi)) {
-            this.content = "<html>\n"+this.content+"\n</html>";
+        var templateFunction = '';
+        // 未声明需要哪个定义模块  OR 声明的错误 OR 声明的是 window
+        if (
+            !namespace ||
+                'string' !== typeof namespace || !!~['window', 'global', 'self', 'parent', 'Window', 'Global'].indexOf(namespace)
+            ) {
+            templateFunction = 'window["' + revPath + '"] = ' + compiled;
         }
-
-        if (!this.content.match(/^<!DOCTYPE[^>]*?>/gi)) {
-            this.content = "<!DOCTYPE html>\n"+this.content;
-        }
-    },
-    findAssets  : function(regx, radical) {
-        var head = [], tail = [];
-        var movetoReg = new RegExp("\\s"+this.flag+"\\s{0,}=\\s{0,}[\'\"]([^\"\']*?)[\'\"]");
-
-        var self = this;
-        this.content = this.content.replace(regx, function (mm) {
-            var m = mm.match(movetoReg);
-            mm = mm.replace(movetoReg, '');
-            if (m && typeof m[1] != "undefined") {
-                if (m[1] == self.head) {
-                    head.push(mm);
-                    return '';
-                }
-                else if (m[1] == self.tail) {
-                    tail.push(mm);
-                    return '';
-                }
-                else {
-                    return mm;
-                }
-            }
-            else if (radical) {
-                // 激进行为，没标明的全放head
-                head.push(mm);
-                return '';
+        else {
+            if (anon) {
+                templateFunction = namespace + '(function(){return ' + compiled + '});';
             }
             else {
-                // 非激进行为，没标明的放原地
-                return mm;
+                templateFunction = namespace + '("' + revPath + '", function () {return ' + compiled + '});';
             }
-        });
+        }
 
-        return {
-            head:head,
-            tail:tail
-        };
-    },
-    putAssets   : function(assets) {
-        this.content = this.content.replace(/<\/head>/, function(mm) {
-            return assets.head.join("\n")+"\n"+mm;
-        });
-        this.content = this.content.replace(/<\/body>/, function(mm) {
-            return assets.tail.join("\n")+"\n"+mm;
-        });
-    },
-    tidy: function() {
-        return this.content.replace(/\s{0,}[\r\n]{1,}/g, "\n");
+        cosoleResp('Compile', htmlName);
+        cosoleResp('Local', absPath);
+
+        return templateFunction;
     }
+
+    return null;
 }
 
-function Feloader(flag, head, tail) {
-    this.fe = new _Feloader(flag, head, tail);
-}
-Feloader.prototype = {
-    constructor: Feloader,
-    action: function(content, radical) {
-        this.fe.input(content);
+exports.css = function(absPath) {
+    // 处理css, Added by jayli, Enhanced by liming.mlm
+    if (/\.css$/i.test(absPath)) {
+        var xcssfile = absPath.replace(/\.css$/i, '');
 
-        var scripts  = this.fe.findAssets(/<script[^>]*? src=['"]([^"']*?)['"].*?>[\s\S]*?<\/script>/g, radical);
-        var styles   = this.fe.findAssets(/<link[^>]*? href=['"]([^"']*?).css['"].*>/g, radical);
-        this.fe.putAssets(styles);
-        this.fe.putAssets(scripts);
+        // less文件解析 less.css => .less
+        if (/\.less\.css$/i.test(absPath) && fs.existsSync(xcssfile)) {
+            return lessCompiler(xcssfile, absPath);
+        }
 
-        return this.fe.tidy();
+        // scss文件解析 scss.css => scss
+        if (/\.scss\.css$/i.test(absPath) && fs.existsSync(xcssfile)) {
+            return scssCompiler(xcssfile, absPath);
+        }
+
+        // .css => .less
+        xcssfile = absPath.replace(/\.css$/i, '.less');
+        if (!fs.existsSync(absPath) && fs.existsSync(xcssfile)) {
+            return lessCompiler(xcssfile);
+        }
+        // .css => .scss
+        xcssfile = absPath.replace(/\.css$/i, '.scss');
+        if (!fs.existsSync(absPath) && fs.existsSync(xcssfile)) {
+            return scssCompiler(xcssfile);
+        }
     }
-};
 
-module.exports = Feloader;
+    return null;
+}
