@@ -77,7 +77,7 @@ function cosoleResp(type, c) {
 }
 
 function lessCompiler(xcssfile, absPath) {
-    var lesstxt = fs.readFileSync(xcssfile);
+    var lesstxt = convert(fs.readFileSync(xcssfile));
 
     lesstxt = lesstxt.replace(/\@import\s+["'](.+)["']\;/g, function (t, basename) {
         var filepath = path.join(path.dirname(xcssfile), basename);

@@ -1,6 +1,6 @@
 {
     "name": "feloader",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "description": "Dynamic JavaScript & CSS",
     "main": "index.js",
     "scripts": {
@@ -16,7 +16,7 @@
         "url" : "https://github.com/Clamjs/feloader.git"
     },
     "dependencies" :{
-        "iconv-lite": "~0.2.5",
+        "iconv-lite": "~0.4.0",
         "is-utf8": "~0.2.0",
         "juicer":"0.6.5-stable-p2",
         "less":"~1.7.5",
