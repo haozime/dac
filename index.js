@@ -3,7 +3,6 @@ var juicer = require('juicer'),
     delog = require("debug.log"),
     sass = require('node-sass'),
     less = require('less'),
-    isUtf8 = require('is-utf8'),
     iconv = require('iconv-lite');
 
 var method_body = [
@@ -77,7 +76,7 @@ function cosoleResp(type, c) {
 }
 
 function lessCompiler(xcssfile, charset, absPath) {
-    var lesstxt = convert(fs.readFileSync(xcssfile), charset);
+    var lesstxt = iconv.decode(fs.readFileSync(xcssfile), charset);
 
     lesstxt = lesstxt.replace(/\@import\s+["'](.+)["']\;/g, function (t, basename) {
         var filepath = path.join(path.dirname(xcssfile), basename);
@@ -87,7 +86,7 @@ function lessCompiler(xcssfile, charset, absPath) {
 
         if (fs.existsSync(filepath)) {
             cosoleResp("Embed", filepath);
-            return convert(fs.readFileSync(filepath), charset);
+            return iconv.decode(fs.readFileSync(filepath), charset);
         }
         else {
             return '';
@@ -109,17 +108,13 @@ function scssCompiler(xcssfile, charset, absPath) {
     cosoleResp("Compiling", xcssfile);
 
     var content = sass.renderSync({
-        data: convert(fs.readFileSync(xcssfile), charset),
+        data: iconv.decode(fs.readFileSync(xcssfile), charset),
         success: function (css, map) {
             cosoleResp("Local", absPath ? absPath : xcssfile);
         }
     });
 
     return content + "\n";
-}
-
-function convert(buff, charset) {
-    return iconv.encode(buff, charset);
 }
 
 exports.jstpl = function(absPath, charset, revPath, namespace, anon) {
@@ -145,7 +140,7 @@ exports.jstpl = function(absPath, charset, revPath, namespace, anon) {
             !namespace ||
                 'string' !== typeof namespace || !!~['window', 'global', 'self', 'parent', 'Window', 'Global'].indexOf(namespace)
             ) {
-            templateFunction = 'window["' + revPath + '"] = ' + compiled;
+            templateFunction = 'window["/' + revPath + '"] = ' + compiled;
         }
         else {
             if (anon) {
@@ -159,7 +154,7 @@ exports.jstpl = function(absPath, charset, revPath, namespace, anon) {
         cosoleResp('Compile', htmlName);
         cosoleResp('Local', absPath);
 
-        return convert(templateFunction, charset);
+        return iconv.encode(templateFunction, charset);
     }
 
     return null;
