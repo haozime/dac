@@ -109,7 +109,7 @@ function scssCompiler(xcssfile, charset, absPath) {
 
     var content = sass.renderSync({
         data: iconv.decode(fs.readFileSync(xcssfile), charset),
-        success: function (css, map) {
+        success: function () {
             cosoleResp("Local", absPath ? absPath : xcssfile);
         }
     });
@@ -136,10 +136,7 @@ exports.jstpl = function(absPath, charset, revPath, namespace, anon) {
 
         var templateFunction = '';
         // 未声明需要哪个定义模块  OR 声明的错误 OR 声明的是 window
-        if (
-            !namespace ||
-                'string' !== typeof namespace || !!~['window', 'global', 'self', 'parent', 'Window', 'Global'].indexOf(namespace)
-            ) {
+        if (!namespace || 'string' !== typeof namespace || !!~['window', 'global', 'self', 'parent', 'Window', 'Global'].indexOf(namespace)) {
             templateFunction = 'window["/' + revPath + '"] = ' + compiled;
         }
         else {
