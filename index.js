@@ -76,8 +76,8 @@ function cosoleResp(type, c) {
     }
 }
 
-function lessCompiler(xcssfile, absPath) {
-    var lesstxt = convert(fs.readFileSync(xcssfile));
+function lessCompiler(xcssfile, charset, absPath) {
+    var lesstxt = convert(fs.readFileSync(xcssfile), charset);
 
     lesstxt = lesstxt.replace(/\@import\s+["'](.+)["']\;/g, function (t, basename) {
         var filepath = path.join(path.dirname(xcssfile), basename);
@@ -87,7 +87,7 @@ function lessCompiler(xcssfile, absPath) {
 
         if (fs.existsSync(filepath)) {
             cosoleResp("Embed", filepath);
-            return convert(fs.readFileSync(filepath));
+            return convert(fs.readFileSync(filepath), charset);
         }
         else {
             return '';
@@ -105,11 +105,11 @@ function lessCompiler(xcssfile, absPath) {
     return content + "\n";
 }
 
-function scssCompiler(xcssfile, absPath) {
+function scssCompiler(xcssfile, charset, absPath) {
     cosoleResp("Compiling", xcssfile);
 
     var content = sass.renderSync({
-        file: xcssfile,
+        data: convert(fs.readFileSync(xcssfile), charset),
         success: function (css, map) {
             cosoleResp("Local", absPath ? absPath : xcssfile);
         }
@@ -118,11 +118,11 @@ function scssCompiler(xcssfile, absPath) {
     return content + "\n";
 }
 
-function convert(buff) {
-    return iconv.decode(buff, isUtf8(buff) ? 'utf8' : 'gbk');
+function convert(buff, charset) {
+    return iconv.encode(buff, charset);
 }
 
-exports.jstpl = function(absPath, revPath, namespace, anon) {
+exports.jstpl = function(absPath, charset, revPath, namespace, anon) {
     namespace = namespace || '';
     anon = anon ? true : false;
 
@@ -130,7 +130,7 @@ exports.jstpl = function(absPath, revPath, namespace, anon) {
     if (/\.html\.js$/i.test(absPath)) {
         var htmlName = absPath.replace(/\.js$/, '');
         try {
-            var compiled = juicer(convert(fs.readFileSync(htmlName)))._render.toString().replace(/^function anonymous[^{]*?{([\s\S]*?)}$/igm, function ($, fn_body) {
+            var compiled = juicer(fs.readFileSync(htmlName).toString())._render.toString().replace(/^function anonymous[^{]*?{([\s\S]*?)}$/igm, function ($, fn_body) {
                 return 'function(_, _method) {' + method_body + fn_body + '};\n';
             });
         }
@@ -159,36 +159,36 @@ exports.jstpl = function(absPath, revPath, namespace, anon) {
         cosoleResp('Compile', htmlName);
         cosoleResp('Local', absPath);
 
-        return templateFunction;
+        return convert(templateFunction, charset);
     }
 
     return null;
 }
 
-exports.css = function(absPath) {
+exports.css = function(absPath, charset) {
     // 处理css, Added by jayli, Enhanced by liming.mlm
     if (/\.css$/i.test(absPath)) {
         var xcssfile = absPath.replace(/\.css$/i, '');
 
         // less文件解析 less.css => .less
         if (/\.less\.css$/i.test(absPath) && fs.existsSync(xcssfile)) {
-            return lessCompiler(xcssfile, absPath);
+            return lessCompiler(xcssfile, charset, absPath);
         }
 
         // scss文件解析 scss.css => scss
         if (/\.scss\.css$/i.test(absPath) && fs.existsSync(xcssfile)) {
-            return scssCompiler(xcssfile, absPath);
+            return scssCompiler(xcssfile, charset, absPath);
         }
 
         // .css => .less
         xcssfile = absPath.replace(/\.css$/i, '.less');
         if (!fs.existsSync(absPath) && fs.existsSync(xcssfile)) {
-            return lessCompiler(xcssfile);
+            return lessCompiler(xcssfile, charset);
         }
         // .css => .scss
         xcssfile = absPath.replace(/\.css$/i, '.scss');
         if (!fs.existsSync(absPath) && fs.existsSync(xcssfile)) {
-            return scssCompiler(xcssfile);
+            return scssCompiler(xcssfile, charset);
         }
     }
 
