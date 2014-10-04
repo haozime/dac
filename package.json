@@ -1,7 +1,7 @@
 {
-    "name": "feloader",
+    "name": "dac",
     "version": "0.1.5",
-    "description": "Dynamic JavaScript & CSS",
+    "description": "Dynamic Assets Compile",
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
@@ -13,7 +13,7 @@
     ],
     "repository": {
         "type": "git",
-        "url" : "https://github.com/Clamjs/feloader.git"
+        "url" : "https://github.com/Clamjs/dac.git"
     },
     "dependencies" :{
         "iconv-lite": "~0.4.0",

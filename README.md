@@ -1,13 +1,13 @@
 # Usage
 ## Install
 ```
-npm install feloader
+npm install dac
 ```
 
 ## Invoke
 ```
-var feloader = require("feloader");
+var dac = require("dac");
 
-var jstpl = feloader.jstpl(absPath, modname, wrapper, isAnon);
-var css = feloader.css(absPath);
+var jstpl = dac.jstpl(absPath, modname, wrapper, isAnon);
+var css   = dac.css(absPath);
 ```
