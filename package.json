@@ -1,6 +1,6 @@
 {
     "name": "feloader",
-    "version": "0.1.4",
+    "version": "0.1.5",
     "description": "Dynamic JavaScript & CSS",
     "main": "index.js",
     "scripts": {
@@ -17,7 +17,7 @@
     },
     "dependencies" :{
         "iconv-lite": "~0.4.0",
-        "juicer":"0.6.5-stable-p2",
+        "juicer":"~0.6.6-stable",
         "less":"~1.7.5",
         "node-sass":"~0.9.3",
         "debug.log": "^0.0.3"

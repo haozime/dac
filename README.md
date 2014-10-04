@@ -8,6 +8,6 @@ npm install feloader
 ```
 var feloader = require("feloader");
 
-var jstpl = feloader.jstpl(absPath, modname, namespace, anon);
+var jstpl = feloader.jstpl(absPath, modname, wrapper, isAnon);
 var css = feloader.css(absPath);
 ```

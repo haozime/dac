@@ -109,9 +109,9 @@ function scssCompiler(xcssfile, charset) {
     return content + "\n";
 }
 
-exports.jstpl = function(absPath, charset, revPath, namespace, anon) {
+exports.jstpl = function(absPath, charset, revPath, wrapper, anon) {
     revPath = revPath || "untitled";
-    namespace = namespace || '';
+    wrapper = wrapper || '';
     anon = anon ? true : false;
 
     // 前后端模板一致化，如果是*.html.js格式的请求，则编译*.html为juicer的function格式返回
@@ -129,15 +129,15 @@ exports.jstpl = function(absPath, charset, revPath, namespace, anon) {
 
         var templateFunction = '';
         // 未声明需要哪个定义模块  OR 声明的错误 OR 声明的是 window
-        if (!namespace || 'string' !== typeof namespace || !!~['window', 'global', 'self', 'parent', 'Window', 'Global'].indexOf(namespace)) {
+        if (!wrapper || 'string' !== typeof wrapper || !!~['window', 'global', 'self', 'parent', 'Window', 'Global'].indexOf(wrapper)) {
             templateFunction = 'window["/' + revPath + '"] = ' + compiled;
         }
         else {
             if (anon) {
-                templateFunction = namespace + '(function(){return ' + compiled + '});';
+                templateFunction = wrapper + '(function(){return ' + compiled + '});';
             }
             else {
-                templateFunction = namespace + '("' + revPath + '", function () {return ' + compiled + '});';
+                templateFunction = wrapper + '("' + revPath + '", function () {return ' + compiled + '});';
             }
         }
 
