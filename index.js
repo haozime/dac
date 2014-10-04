@@ -68,7 +68,7 @@ function cosoleResp(type, c) {
 }
 
 function lessCompiler(xcssfile, charset) {
-    var lesstxt = iconv.decode(fs.readFileSync(xcssfile), charset);
+    var lesstxt = fs.readFileSync(xcssfile).toString();
 
     lesstxt = lesstxt.replace(/\@import\s+["'](.+)["']\;/g, function (t, basename) {
         var filepath = path.join(path.dirname(xcssfile), basename);
@@ -78,7 +78,7 @@ function lessCompiler(xcssfile, charset) {
 
         if (fs.existsSync(filepath)) {
             cosoleResp("Embed", filepath);
-            return iconv.decode(fs.readFileSync(filepath), charset);
+            return fs.readFileSync(filepath).toString();
         }
         else {
             return '';
@@ -91,22 +91,22 @@ function lessCompiler(xcssfile, charset) {
         .parse(lesstxt, function (e, tree) {
             cosoleResp("Local", xcssfile);
             return tree.toCSS();
-        });
+        }) + "\n";
 
-    return content + "\n";
+    return iconv.encode(content, charset);
 }
 
 function scssCompiler(xcssfile, charset) {
     cosoleResp("Compile", xcssfile);
 
     var content = sass.renderSync({
-        data: iconv.decode(fs.readFileSync(xcssfile), charset),
+        data: fs.readFileSync(xcssfile).toString(),
         success: function () {
             cosoleResp("Local", xcssfile);
         }
-    });
+    }) + "\n";
 
-    return content + "\n";
+    return iconv.encode(content, charset);
 }
 
 exports.jstpl = function(absPath, charset, revPath, wrapper, anon) {
