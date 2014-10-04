@@ -51,31 +51,23 @@ function cosoleResp(type, c) {
     c += " [" + type + ']';
 
     switch (type) {
-        case "Need":
-            delog.request(c);
-            break;
         case "Compile":
         case "Embed":
             delog.process(c);
             break;
-        case "Disable":
-            c = "<= " + c;
         case "Error":
             delog.error(c);
             break;
         case "Local":
-        case "Remote":
-        case "Cache":
             delog.response(c);
             console.log('');
             break;
-        case "Actually":
         default:
             delog.log(c);
     }
 }
 
-function lessCompiler(xcssfile, charset, absPath) {
+function lessCompiler(xcssfile, charset) {
     var lesstxt = iconv.decode(fs.readFileSync(xcssfile), charset);
 
     lesstxt = lesstxt.replace(/\@import\s+["'](.+)["']\;/g, function (t, basename) {
@@ -97,20 +89,20 @@ function lessCompiler(xcssfile, charset, absPath) {
 
     var content = new (less.Parser)({processImports: false})
         .parse(lesstxt, function (e, tree) {
-            cosoleResp("Local", absPath ? absPath : xcssfile);
+            cosoleResp("Local", xcssfile);
             return tree.toCSS();
         });
 
     return content + "\n";
 }
 
-function scssCompiler(xcssfile, charset, absPath) {
-    cosoleResp("Compiling", xcssfile);
+function scssCompiler(xcssfile, charset) {
+    cosoleResp("Compile", xcssfile);
 
     var content = sass.renderSync({
         data: iconv.decode(fs.readFileSync(xcssfile), charset),
         success: function () {
-            cosoleResp("Local", absPath ? absPath : xcssfile);
+            cosoleResp("Local", xcssfile);
         }
     });
 
@@ -118,6 +110,7 @@ function scssCompiler(xcssfile, charset, absPath) {
 }
 
 exports.jstpl = function(absPath, charset, revPath, namespace, anon) {
+    revPath = revPath || "untitled";
     namespace = namespace || '';
     anon = anon ? true : false;
 
@@ -158,18 +151,18 @@ exports.jstpl = function(absPath, charset, revPath, namespace, anon) {
 }
 
 exports.css = function(absPath, charset) {
-    // 处理css, Added by jayli, Enhanced by liming.mlm
     if (/\.css$/i.test(absPath)) {
+
         var xcssfile = absPath.replace(/\.css$/i, '');
 
         // less文件解析 less.css => .less
         if (/\.less\.css$/i.test(absPath) && fs.existsSync(xcssfile)) {
-            return lessCompiler(xcssfile, charset, absPath);
+            return lessCompiler(xcssfile, charset);
         }
 
         // scss文件解析 scss.css => scss
         if (/\.scss\.css$/i.test(absPath) && fs.existsSync(xcssfile)) {
-            return scssCompiler(xcssfile, charset, absPath);
+            return scssCompiler(xcssfile, charset);
         }
 
         // .css => .less
