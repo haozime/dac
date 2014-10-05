@@ -3,6 +3,7 @@ var juicer = require('juicer'),
     delog = require("debug.log"),
     sass = require('node-sass'),
     less = require('less'),
+    isUtf8 = require("is-utf8"),
     iconv = require('iconv-lite');
 
 var method_body = [
@@ -67,8 +68,13 @@ function cosoleResp(type, c) {
     }
 }
 
+function getUTF8Str(filepath) {
+    var buff = fs.readFileSync(filepath);
+    return isUtf8(buff) ? buff.toString() : iconv.decode(buff, "gbk");
+}
+
 function lessCompiler(xcssfile, charset) {
-    var lesstxt = fs.readFileSync(xcssfile).toString();
+    var lesstxt = getUTF8Str(xcssfile);
 
     lesstxt = lesstxt.replace(/\@import\s+["'](.+)["']\;/g, function (t, basename) {
         var filepath = path.join(path.dirname(xcssfile), basename);
@@ -78,7 +84,7 @@ function lessCompiler(xcssfile, charset) {
 
         if (fs.existsSync(filepath)) {
             cosoleResp("Embed", filepath);
-            return fs.readFileSync(filepath).toString();
+            return getUTF8Str(filepath);
         }
         else {
             return '';
@@ -100,7 +106,7 @@ function scssCompiler(xcssfile, charset) {
     cosoleResp("Compile", xcssfile);
 
     var content = sass.renderSync({
-        data: fs.readFileSync(xcssfile).toString(),
+        data: getUTF8Str(xcssfile),
         success: function () {
             cosoleResp("Local", xcssfile);
         }
@@ -118,7 +124,7 @@ exports.jstpl = function(absPath, charset, revPath, wrapper, anon) {
     if (/\.html\.js$/i.test(absPath)) {
         var htmlName = absPath.replace(/\.js$/, '');
         try {
-            var compiled = juicer(fs.readFileSync(htmlName).toString())._render.toString().replace(/^function anonymous[^{]*?{([\s\S]*?)}$/igm, function ($, fn_body) {
+            var compiled = juicer(getUTF8Str(htmlName))._render.toString().replace(/^function anonymous[^{]*?{([\s\S]*?)}$/igm, function ($, fn_body) {
                 return 'function(_, _method) {' + method_body + fn_body + '};\n';
             });
         }

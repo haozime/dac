@@ -1,6 +1,6 @@
 {
     "name": "dac",
-    "version": "0.1.6",
+    "version": "0.1.7",
     "description": "Dynamic Assets Compiler",
     "main": "index.js",
     "scripts": {
@@ -17,6 +17,7 @@
     },
     "dependencies" :{
         "iconv-lite": "~0.4.0",
+        "is-utf8": "~0.2.0",
         "juicer":"~0.6.6-stable",
         "less":"~1.7.5",
         "node-sass":"~0.9.3",
