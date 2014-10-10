@@ -1,5 +1,6 @@
 var juicer = require('juicer'),
     fs = require('fs'),
+    path = require("path"),
     delog = require("debug.log"),
     sass = require('node-sass'),
     less = require('less'),
@@ -76,8 +77,8 @@ function getUTF8Str(filepath) {
 function lessCompiler(xcssfile, charset) {
     var lesstxt = getUTF8Str(xcssfile);
 
-    lesstxt = lesstxt.replace(/\@import\s+["'](.+)["']\;/g, function (t, basename) {
-        var filepath = path.join(path.dirname(xcssfile), basename);
+    lesstxt = lesstxt.replace(/@import\s+(["'])(\S+?)\1;?/mg, function (t, f, relpath) {
+        var filepath = path.join(path.dirname(xcssfile), relpath);
         if (!/\.[a-z]{1,}$/i.test(filepath)) {
             filepath += ".less";
         }
@@ -95,6 +96,9 @@ function lessCompiler(xcssfile, charset) {
 
     var content = new (less.Parser)({processImports: false})
         .parse(lesstxt, function (e, tree) {
+            if (e) {
+                return "/*LESS COMPILE ERROR: "+xcssfile+"*/";
+            }
             cosoleResp("Local", xcssfile);
             return tree.toCSS();
         }) + "\n";
