@@ -1,25 +1,27 @@
 {
-    "name": "dac",
-    "version": "0.1.8",
-    "description": "Dynamic Assets Compiler",
-    "main": "index.js",
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "keywords": [
-        "assets",
-        "javascript",
-        "css"
-    ],
-    "repository": {
-        "type": "git",
-        "url" : "https://github.com/Clamjs/dac.git"
-    },
-    "dependencies" :{
-        "juicer":"~0.6.6-stable",
-        "less":"~1.7.5",
-        "node-sass":"~0.9.3"
-    },
-    "author": "limingv5",
-    "license": "ISC"
+  "name": "dac",
+  "version": "0.2.0",
+  "description": "Dynamic Assets Compiler",
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [
+    "assets",
+    "javascript",
+    "css",
+    "less",
+    "template",
+    "juicer"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Clamjs/dac.git"
+  },
+  "dependencies": {
+    "iconv-lite": "~0.4.4",
+    "is-utf8": "~0.2.0",
+    "juicer": "~0.6.6-stable",
+    "less": "~2.2.0"
+  },
+  "author": "limingv5",
+  "license": "ISC"
 }
