@@ -54,7 +54,7 @@ module.exports = function (htmlfile, _url, param, cb) {
       result = wrapper + "(\"" + packageName + "\", function () {return " + compiled + "});";
     }
 
-    cb(false, result, htmlfile);
+    cb(false, result, htmlfile, "application/javascript");
   }
   else {
     cb(true);

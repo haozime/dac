@@ -12,11 +12,11 @@ module.exports = function (xcssfile, url, param, cb) {
       filename: xcssfile
     }, function(e, result) {
       if (!e) {
-        cb(e, result.css, xcssfile);
+        cb(e, result.css, xcssfile, "text/css");
       }
       else {
         console.log(e);
-        cb(e, lesstext, xcssfile);
+        cb(e, lesstext, xcssfile, "text/css");
       }
     });
   }
