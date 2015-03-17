@@ -1,2 +1,2 @@
 exports.less = require("./engines/less.js");
-exports.jpl  = require("./engines/jpl.js");
+exports.tpl  = require("./engines/tpl.js");

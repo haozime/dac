@@ -32,7 +32,7 @@ var method_body = [
 ].join('');
 
 module.exports = function (htmlfile, _url, param, cb) {
-  htmlfile = htmlfile.replace(/\.jpl$|\.html\.js$|\.tpl\.js$/, ".html");
+  htmlfile = htmlfile.replace(/(\.html)\.js$|(\.tpl)\.js$/, "$1$2");
 
   var tpl = helper.getUnicode(htmlfile);
   if (tpl !== null) {
