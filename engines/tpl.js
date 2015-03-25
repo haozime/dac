@@ -31,9 +31,10 @@ var method_body = [
   "_method.__throw = __throw;"
 ].join('');
 
-module.exports = function (htmlfile, _url, param, cb) {
-  htmlfile = htmlfile.replace(/(\.html)\.js$|(\.tpl)\.js$/, "$1$2");
+module.exports = function (htmljsfile, _url, param, cb) {
+  var MIME = "application/javascript";
 
+  var htmlfile = htmljsfile.replace(/(\.html)\.js$|(\.tpl)\.js$/, "$1$2");
   var tpl = helper.getUnicode(htmlfile);
   if (tpl !== null) {
     var compiled = juicer(tpl)._render.toString().replace(/^function anonymous[^{]*?{([\s\S]*?)}$/img, function ($, fn_body) {
@@ -54,9 +55,15 @@ module.exports = function (htmlfile, _url, param, cb) {
       result = wrapper + "(\"" + packageName + "\", function () {return " + compiled + "});";
     }
 
-    cb(false, result, htmlfile, "application/javascript");
+    cb(false, result, htmlfile, MIME);
   }
   else {
-    cb(true);
+    tpl = helper.getUnicode(htmljsfile);
+    if (tpl !== null) {
+      cb(false, tpl, htmljsfile, MIME);
+    }
+    else {
+      cb(true);
+    }
   }
 };

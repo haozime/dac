@@ -1,26 +1,33 @@
 var helper = require("../lib/util");
 var less = require("less");
 
-module.exports = function (xcssfile, url, param, cb) {
-  xcssfile = xcssfile.replace(/(\.less)\.css$/, "$1");
+module.exports = function (pxcssfile, url, param, cb) {
+  var MIME = "text/css";
 
+  var xcssfile = pxcssfile.replace(/(\.less)\.css$/, "$1");
   var lesstext = helper.getUnicode(xcssfile);
   if (lesstext !== null) {
     less.render(lesstext, {
       paths: [],
       compress: false,
       filename: xcssfile
-    }, function(e, result) {
+    }, function (e, result) {
       if (!e) {
-        cb(e, result.css, xcssfile, "text/css");
+        cb(e, result.css, xcssfile, MIME);
       }
       else {
         console.log(e);
-        cb(e, lesstext, xcssfile, "text/css");
+        cb(e, "/* " + xcssfile + " */", xcssfile, MIME);
       }
     });
   }
   else {
-    cb(true);
+    lesstext = helper.getUnicode(pxcssfile);
+    if (lesstext !== null) {
+      cb(false, lesstext, pxcssfile, MIME);
+    }
+    else {
+      cb(true);
+    }
   }
 };
