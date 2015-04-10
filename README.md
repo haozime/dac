@@ -18,6 +18,8 @@ dac.tpl(realpath, reqOpt, params, callback);
 
 ```
 module.exports = function (abspath, reqOpt, param, cb) {
+  var url = reqOpt.path;
+  
   cb(err, "CONTENT", "REALPATH", "MIME");
 };
 ```
