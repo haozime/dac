@@ -31,7 +31,8 @@ var method_body = [
   "_method.__throw = __throw;"
 ].join('');
 
-module.exports = function (htmljsfile, _url, param, cb) {
+module.exports = function (htmljsfile, reqOpt, param, cb) {
+  var _url = reqOpt.path;
   var MIME = "application/javascript";
 
   var htmlfile = htmljsfile.replace(/(\.html)\.js$|(\.tpl)\.js$/, "$1$2");

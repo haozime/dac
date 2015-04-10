@@ -1,7 +1,7 @@
 var helper = require("../lib/util");
 var less = require("less");
 
-module.exports = function (pxcssfile, url, param, cb) {
+module.exports = function (pxcssfile, reqOpt, param, cb) {
   var MIME = "text/css";
 
   var xcssfile = pxcssfile.replace(/(\.less)\.css$/, "$1");
