@@ -38,6 +38,7 @@ module.exports = function (htmljsfile, reqOpt, param, cb) {
   var htmlfile = htmljsfile.replace(/(\.html)\.js$|(\.tpl)\.js$/, "$1$2");
   var tpl = helper.getUnicode(htmlfile);
   if (tpl !== null) {
+    tpl = tpl.replace(/<!--\s{0,}#def([\s\S]*?)-->/gi, '');
     var compiled = juicer(tpl)._render.toString().replace(/^function anonymous[^{]*?{([\s\S]*?)}$/img, function ($, fn_body) {
       return "function(_, _method) {" + method_body + fn_body + "};\n";
     });
@@ -64,7 +65,7 @@ module.exports = function (htmljsfile, reqOpt, param, cb) {
       cb(false, tpl, htmljsfile, MIME);
     }
     else {
-      cb(true);
+      cb({code: "Not Found"});
     }
   }
 };
