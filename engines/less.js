@@ -27,7 +27,7 @@ module.exports = function (pxcssfile, reqOpt, param, cb) {
       cb(false, lesstext, pxcssfile, MIME);
     }
     else {
-      cb(true);
+      cb({code: "Not Found"});
     }
   }
 };
