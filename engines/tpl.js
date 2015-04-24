@@ -1,5 +1,6 @@
 var helper = require("../lib/util");
 var juicer = require("juicer");
+var pathLib = require("path");
 
 var method_body = [
   "var __escapehtml = {",
@@ -39,6 +40,12 @@ module.exports = function (htmljsfile, reqOpt, param, cb) {
   var tpl = helper.getUnicode(htmlfile);
   if (tpl !== null) {
     tpl = tpl.replace(/<!--\s{0,}#def([\s\S]*?)-->/gi, '');
+
+    tpl = tpl.replace(/<!--\s{0,}#eachInclude[^\->]*?file\s{0,}=\s{0,}(["'])\s{0,}([^"']*?)\s{0,}\1\s{1,}(.+)\s{1,}as\s{1,}(.+)[^>]*?-->/gi, function (i, m1, m2, m3, m4) {
+      var tempPath = pathLib.join(htmljsfile.replace(reqOpt.path, ''), m2);
+      return "{@each " + m3 + " as " + m4 + "}" + (helper.getUnicode(tempPath) || '') + "{@/each}";
+    });
+
     var compiled = juicer(tpl)._render.toString().replace(/^function anonymous[^{]*?{([\s\S]*?)}$/img, function ($, fn_body) {
       return "function(_, _method) {" + method_body + fn_body + "};\n";
     });
