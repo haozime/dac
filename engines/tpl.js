@@ -18,7 +18,7 @@ module.exports = function (htmljsfile, reqOpt, param, cb) {
     var compiled = juicer(tpl)._render.toString().replace(/^function anonymous[^{]*?{\n?([\s\S]*?)\n?}$/img, function ($, fn_body) {
       fn_body = fn_body.replace(/(['"])use strict\1;?\n?/g, '');
 
-      var escapehtml = [];
+      var escapehtml = [], flag = false;
       if (/__escapehtml\.escaping|__escapehtml\.escapehash|__escapehtml\.escapereplace/.test(fn_body)) {
         escapehtml.push(
           "escapehash:" + JSON.stringify({
@@ -32,17 +32,17 @@ module.exports = function (htmljsfile, reqOpt, param, cb) {
           "escapereplace:function(k){return __escapehtml.escapehash[k]}",
           "escaping:function(s){return typeof(s)!='string'?s:s.replace(/[&<>\"]/img,this.escapereplace)}"
         );
+        flag = true;
       }
       if (/__escapehtml\.detection/.test(fn_body)) {
-        escapehtml.push("detection: function(d){return typeof(d)=='undefined'?'':d}")
+        escapehtml.push("detection:function(d){return typeof(d)=='undefined'?'':d}");
+        flag = true;
       }
 
-      return "function(_, _method) {" +
-        "_method = _method || {};" +
-        "_method.__throw = function(e) {throw(e)};" +
-        (escapehtml.length ? "_method.__escapehtml = {" : '') +
-        escapehtml.join(',') +
-        (escapehtml.length ? "};" : '') +
+      return "function(_, _method){" +
+        "_method=_method||{};" +
+        "_method.__throw=function(e){throw(e)};" +
+        (flag ? ("_method.__escapehtml={" + escapehtml.join(',') + "};") : '') +
         fn_body + "};";
     });
 
@@ -51,13 +51,13 @@ module.exports = function (htmljsfile, reqOpt, param, cb) {
     var result = '';
 
     if (!wrapper || "string" !== typeof wrapper || !!~["window", "global", "self", "parent", "Window", "Global"].indexOf(wrapper)) {
-      result = "window[\"" + packageName + "\"] = " + compiled;
+      result = "window[\"" + packageName + "\"]=" + compiled;
     }
     else if (param.anonymous) {
       result = wrapper + "(function(){return " + compiled + "});";
     }
     else {
-      result = wrapper + "(\"" + packageName + "\", function () {return " + compiled + "});";
+      result = wrapper + "(\"" + packageName + "\",function(){return " + compiled + "});";
     }
 
     cb(false, result, htmlfile, MIME);
