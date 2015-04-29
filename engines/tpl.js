@@ -29,7 +29,7 @@ module.exports = function (htmljsfile, reqOpt, param, cb) {
             "'": '&#x27;',
             '/': '&#x2f;'
           }),
-          "escapereplace:function(k){return __escapehtml.escapehash[k]}",
+          "escapereplace:function(k){return _method.__escapehtml.escapehash[k]}",
           "escaping:function(s){return typeof(s)!='string'?s:s.replace(/[&<>\"]/img,this.escapereplace)}"
         );
         flag = true;
