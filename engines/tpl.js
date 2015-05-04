@@ -39,25 +39,33 @@ module.exports = function (htmljsfile, reqOpt, param, cb) {
         flag = true;
       }
 
-      return "function(_, _method){" +
+      return "function(_,_method){" +
         "_method=_method||{};" +
         "_method.__throw=function(e){throw(e)};" +
         (flag ? ("_method.__escapehtml={" + escapehtml.join(',') + "};") : '') +
         fn_body + "};";
     });
 
-    var wrapper = param.define;
-    var packageName = helper.filteredUrl(_url, param.filter);
     var result = '';
+    var wrapper = param.define;
+    var anonymous = param.anonymous;
+    var packageName = '"' + helper.filteredUrl(_url, param.filter) + '"';
 
-    if (!wrapper || "string" !== typeof wrapper || !!~["window", "global", "self", "parent", "Window", "Global"].indexOf(wrapper)) {
-      result = "window[\"" + packageName + "\"]=" + compiled;
-    }
-    else if (param.anonymous) {
-      result = wrapper + "(function(){return " + compiled + "});";
+    if (wrapper) {
+      if (anonymous) {
+        result = wrapper + "(function(){return " + compiled + "});";
+      }
+      else {
+        result = wrapper + '(' + packageName + ",function(){return " + compiled + "});";
+      }
     }
     else {
-      result = wrapper + "(\"" + packageName + "\",function(){return " + compiled + "});";
+      if (anonymous) {
+        result = "module.exports=" + compiled;
+      }
+      else {
+        result = "window[" + packageName + "]=" + compiled;
+      }
     }
 
     cb(false, result, htmlfile, MIME);
