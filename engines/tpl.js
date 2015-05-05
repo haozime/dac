@@ -16,10 +16,7 @@ module.exports = function (htmljsfile, reqOpt, param, cb) {
     });
 
     var compiled = juicer(tpl)._render.toString().replace(/^function anonymous[^{]*?{\n?([\s\S]*?)\n?}$/img, function ($, fn_body) {
-      fn_body = fn_body
-        .replace(/(['"])use strict\1;?\n?/g, '')
-        .replace(/\s{0,}\';/g, "';").replace(/=\'\s{0,}/g, "='")
-        .replace(/>\s{1,}</g, "><");
+      fn_body = fn_body.replace(/(['"])use strict\1;?\n?/g, '');
 
       var escapehtml = [], flag = false;
       if (/__escapehtml\.escaping|__escapehtml\.escapehash|__escapehtml\.escapereplace/.test(fn_body)) {
