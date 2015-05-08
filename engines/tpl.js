@@ -15,6 +15,15 @@ module.exports = function (htmljsfile, reqOpt, param, cb) {
       return "{@each " + m3 + " as " + m4 + "}" + (helper.getUnicode(tempPath) || '') + "{@/each}";
     });
 
+    var _method = [
+      "_method=_method||{};",
+      "_method.__throw=function(e){throw(e)};"
+    ];
+    tpl = tpl.replace(/\{@helper\s{1,}([^\}]*?)\}([\s\S]*?)\{@\/helper\}/igm, function (all, funcname, func) {
+      _method.push("_method." + funcname + '=' + func.replace(/^\s{0,}\n{1,}\s{0,}|\s{0,}\n{1,}\s{0,}$/g, '') + ';');
+      return '';
+    });
+
     var compiled = juicer(tpl)._render.toString().replace(/^function anonymous[^{]*?{\n?([\s\S]*?)\n?}$/img, function ($, fn_body) {
       fn_body = fn_body.replace(/(['"])use strict\1;?\n?/g, '');
 
@@ -40,8 +49,7 @@ module.exports = function (htmljsfile, reqOpt, param, cb) {
       }
 
       return "function(_,_method){" +
-        "_method=_method||{};" +
-        "_method.__throw=function(e){throw(e)};" +
+        _method.join('') +
         (flag ? ("_method.__escapehtml={" + escapehtml.join(',') + "};") : '') +
         fn_body + "};";
     });
