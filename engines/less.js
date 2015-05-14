@@ -17,7 +17,7 @@ module.exports = function (pxcssfile, reqOpt, param, cb) {
     compress: false,
     filename: xcssfile
   };
-  if (isMap || param.sourcemap) {
+  if (isMap || param._sourcemap) {
     renderOpt.sourceMap = {
       sourceMapBasepath: path.dirname(pxcssfile),
       sourceMapURL: path.basename(pxcssfile) + ".map"
