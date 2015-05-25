@@ -1,6 +1,8 @@
 var helper = require("../lib/util");
 var less = require("less");
 var path = require("path");
+var plugins = require("../lib/less-plugins")(less);
+less.functions.functionRegistry.addMultiple(plugins.functions);
 
 module.exports = function (pxcssfile, reqOpt, param, cb) {
   var MIME = "text/css";
