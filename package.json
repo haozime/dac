@@ -17,14 +17,12 @@
     "url": "https://github.com/Clamjs/dac.git"
   },
   "dependencies": {
+    "clean-css": "~3.4.8",
     "iconv-lite": "~0.4.13",
-    "is-utf8": "~0.2.0",
+    "is-utf8": "~0.2.1",
     "juicer": "~0.6.11",
     "less": "~2.5.3"
   },
   "author": "limingv5",
-  "license": "ISC",
-  "devDependencies": {
-    "clean-css": "~3.4.8"
-  }
+  "license": "ISC"
 }
