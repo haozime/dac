@@ -3,7 +3,6 @@ var juicer = require("juicer");
 var pathLib = require("path");
 
 module.exports = function (htmljsfile, reqOpt, param, cb) {
-  var _url = reqOpt.path;
   var MIME = "application/javascript";
 
   var htmlfile = htmljsfile.replace(/(\.html)\.js$|(\.tpl)\.js$/, "$1$2");
@@ -54,32 +53,7 @@ module.exports = function (htmljsfile, reqOpt, param, cb) {
         fn_body + "};";
     });
 
-    var result = '';
-    var wrapper = param.define;
-    var anonymous = param.anonymous;
-    var packageName = '"' + helper.filteredUrl(_url, param.filter) + '"';
-
-    if (wrapper) {
-      result = wrapper + '(';
-
-      if (!anonymous) {
-        result += packageName + ',';
-      }
-
-      if (wrapper == "define") {
-        result += "function(require,exports,module){module.exports=";
-      }
-      else {
-        result += "function(){return ";
-      }
-
-      result += compiled + "});";
-    }
-    else {
-      result = "window[" + packageName + "]=" + compiled;
-    }
-
-    cb(false, result, htmlfile, MIME);
+    cb(false, helper.wrapper(compiled, reqOpt.path, param), htmlfile, MIME);
   }
   else {
     tpl = helper.getUnicode(htmljsfile);
