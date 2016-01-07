@@ -13,25 +13,23 @@ var toString = function (compiled) {
 module.exports = function (absPath, reqOpt, param, cb) {
   absPath = absPath.replace(/\.js$/, '');
 
-  var MIME = "application/javascript";
-
-  if (/\.less\.css$/.test(absPath)) {
-    lessLayer(absPath, reqOpt, param, function (err, compiled, pxcssfile) {
-      if (err) {
-        cb(err);
-      }
-      else {
-        cb(null, helper.wrapper(toString(compiled), reqOpt.path, param), pxcssfile, MIME);
-      }
-    });
-  }
-  else {
-    var compiled = helper.getUnicode(absPath);
-    if (compiled) {
-      cb(null, helper.wrapper(toString(compiled), reqOpt.path, param), absPath, MIME);
+  lessLayer(absPath, reqOpt, param, function (err, compiled, pxcssfile) {
+    if (err) {
+      cb(err);
     }
     else {
-      cb({code: "Not Found"});
+      compiled = "function(_id){" +
+        "var ID=_id||'J_dacStyle',dom=document.getElementById(ID);" +
+        "var styleNode=document.createTextNode(" + toString(compiled) + ");" +
+        "if(dom){" +
+        "dom.appendChild(styleNode);" +
+        "}else{" +
+        "dom=document.createElement('style');" +
+        "dom.id=ID;" +
+        "dom.appendChild(styleNode);" +
+        "document.getElementsByTagName('head')[0].appendChild(dom);" +
+        "}}";
+      cb(null, helper.wrapper(compiled, reqOpt.path, param), pxcssfile, "application/javascript");
     }
-  }
+  });
 };
