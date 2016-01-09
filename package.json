@@ -1,6 +1,6 @@
 {
   "name": "dac",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "Dynamic Assets Compiler",
   "main": "index.js",
   "scripts": {},
@@ -17,7 +17,7 @@
     "url": "https://github.com/Clamjs/dac.git"
   },
   "dependencies": {
-    "clean-css": "~3.4.8",
+    "clean-css": "~3.4.9",
     "iconv-lite": "~0.4.13",
     "is-utf8": "~0.2.1",
     "juicer": "~0.6.11",
