@@ -1,6 +1,6 @@
 {
   "name": "dac",
-  "version": "0.7.2",
+  "version": "0.7.3",
   "description": "Dynamic Assets Compiler",
   "main": "index.js",
   "scripts": {},
@@ -21,7 +21,7 @@
     "iconv-lite": "~0.4.13",
     "is-utf8": "~0.2.1",
     "juicer": "~0.6.11",
-    "less": "~2.5.3"
+    "less": "~2.6.0"
   },
   "author": "limingv5",
   "license": "ISC"
