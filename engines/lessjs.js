@@ -3,9 +3,9 @@ var CleanCSS = require("clean-css");
 var helper = require("../lib/util");
 
 var toString = function (compiled) {
-  var styles = new CleanCSS().minify(compiled).styles;
-  styles = styles.replace(/(")/g, function (all, q) {
-    return '\\' + q;
+  var styles = new CleanCSS({compatibility:"ie7"}).minify(compiled).styles;
+  styles = styles.replace(/"|\\\d/g, function (all) {
+    return '\\' + all;
   });
   return '"' + styles + '"';
 };
