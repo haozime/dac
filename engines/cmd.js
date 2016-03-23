@@ -4,7 +4,7 @@ var minimatch = require("minimatch");
 module.exports = function (absPath, reqOpt, param, cb) {
   var content = helper.getUnicode(absPath);
 
-  if (content === null || !param.enable || param.ignore.some(function (rule) {
+  if (content === null || /define\(/.test(content) || !param.enable || param.ignore.some(function (rule) {
       return minimatch(reqOpt.path.replace(/^\//, ''), rule);
     })) {
     cb({msg: "PASS Engine"});
