@@ -1,10 +1,12 @@
 var helper = require("../lib/util");
+var minimatch = require("minimatch");
 
 module.exports = function (absPath, reqOpt, param, cb) {
   var content = helper.getUnicode(absPath);
 
-  var regxStr = "define\\(" + (param.ignore ? ('|' + param.ignore) : '');
-  if (new RegExp(regxStr).test(content) || !param.enable) {
+  if (content === null || !param.enable || param.ignore.some(function (rule) {
+      return minimatch(reqOpt.path.replace(/^\//, ''), rule);
+    })) {
     cb({msg: "PASS Engine"});
   }
   else {
