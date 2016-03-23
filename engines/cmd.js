@@ -7,7 +7,7 @@ module.exports = function (absPath, reqOpt, param, cb) {
   if (content === null || /define\(/.test(content) || !param.enable || param.ignore.some(function (rule) {
       return minimatch(reqOpt.path.replace(/^\//, ''), rule);
     })) {
-    cb({msg: "PASS Engine"});
+    cb({code: "PASS Engine"});
   }
   else {
     cb(null, "define(function(require,exports,module){\n" + content + "\n});", absPath, "application/javascript");
