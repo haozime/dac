@@ -1,12 +1,13 @@
 var helper = require("../lib/util");
 
 module.exports = function (absPath, reqOpt, param, cb) {
-  var anonymous = param.anonymous;
-  var packageName = '"' + helper.filteredUrl(reqOpt.path, param.filter) + '",';
+  var content = helper.getUnicode(absPath);
 
-  var js = "define(" + (anonymous ? '' : packageName) + "function(require,exports,module){\n" +
-    helper.getUnicode(absPath) +
-    "\n});";
-
-  cb(null, js, absPath, "application/javascript");
+  var regxStr = "define\\(" + (param.ignore ? ('|' + param.ignore) : '');
+  if (new RegExp(regxStr).test(content) || !param.enable) {
+    cb({msg: "PASS Engine"});
+  }
+  else {
+    cb(null, "define(function(require,exports,module){\n" + content + "\n});", absPath, "application/javascript");
+  }
 };
