@@ -1,30 +1,34 @@
 var helper = require("../lib/util");
-var minimatch = require("minimatch");
-var babel = require('babel-core');
+var babel  = require("babel-core");
+
 var BABEL_DEFAULT_OPTIONS = {
-  presets: ['es2015', 'stage-3'],
+  presets: ["es2015", "stage-3"],
   sourceMaps: false,
-  retainLines: true,
+  retainLines: true
 };
 
 function extend(to, from) {
   var i;
   to = to || {};
-  for(i in from) {
+  for (i in from) {
     to[i] = from[i];
   }
   return to;
 }
 
 module.exports = function (absPath, reqOpt, param, cb) {
-  param.options.sourceRoot = absPath;
-  var babelOptions = extend(BABEL_DEFAULT_OPTIONS, param.options);
-  var content = helper.getUnicode(absPath);
-  var code = babel.transform(content, babelOptions).code;
+  var content = typeof absPath == "object" ? absPath.content : helper.getUnicode(absPath);
 
-  if (!param.enable || content === null || /define\(/.test(content)) {
+  if (content === null) {
     cb({code: "PASS Engine"});
-  } else {
-    cb(null, "define(function(require,exports,module){" + code + "\n});", absPath, "application/javascript");
+  }
+  else if (!param.enable) {
+    cb(null, content, absPath, "application/javascript");
+  }
+  else {
+    //param.options.sourceRoot = absPath;
+    //var babelOptions = extend(BABEL_DEFAULT_OPTIONS, param.options);
+    //var code = babel.transform(content, babelOptions).code;
+    cb(null, "var a = 1;", absPath, "application/javascript");
   }
 };
