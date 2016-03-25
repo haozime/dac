@@ -15,10 +15,10 @@ module.exports = function (absPath, reqOpt, param, cb) {
     var path = reqOpt.path.replace(/^\//, '');
 
     if (helper.matchPath(path, param.cmd) && ignoreText(content)) {
-      cb(null, "define(function(require,exports,module){\n" + content + "\n});", absPath, MIME);
+      cb(null, "define(function(require,exports,module){" + content + "});", absPath, MIME);
     }
     else if (helper.matchPath(path, param.kmd) && ignoreText(content)) {
-      cb(null, "KISSY.add(function(S,require,exports,module){\n" + content + "\n});", absPath, MIME);
+      cb(null, "KISSY.add(function(S,require,exports,module){" + content + "});", absPath, MIME);
     }
     else {
       cb(null, content, absPath, MIME);
