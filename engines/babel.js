@@ -15,11 +15,11 @@ module.exports = function (absPath, reqOpt, param, cb) {
   if (content === null) {
     cb({code: "PASS Engine"});
   }
-  else if (!param.enable) {
-    cb(null, content, absPath, "application/javascript");
-  }
-  else {
+  else if (helper.matchPath(reqOpt.path.replace(/^\//, ''), param.target)) {
     var babelOptions = helper.extend(BABEL_DEFAULT_OPTIONS, param.options);
     cb(null, babel.transform(content, babelOptions).code, absPath, "application/javascript");
+  }
+  else {
+    cb(null, content, absPath, "application/javascript");
   }
 };
