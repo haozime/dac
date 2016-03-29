@@ -12,7 +12,7 @@ module.exports = function (absPath, reqOpt, param, cb) {
   }
   else {
     var MIME = "application/javascript";
-    var path = reqOpt.path.replace(/^\//, '');
+    var path = require("path").relative('/', reqOpt.path);
 
     if (helper.matchPath(path, param.cmd) && ignoreText(content)) {
       cb(null, "define(function(require,exports,module){" + content + "});", absPath, MIME);

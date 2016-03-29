@@ -1,17 +1,10 @@
-var helper = require("../lib/util");
 var less = require("less");
-var path = require("path");
+var helper = require("../lib/util");
 var plugins = require("../lib/less-plugins")(less);
 less.functions.functionRegistry.addMultiple(plugins.functions);
 
 module.exports = function (pxcssfile, reqOpt, param, cb) {
   var MIME = "text/css";
-
-  var isMap = false;
-  if (/\.map$/.test(pxcssfile)) {
-    isMap = true;
-    pxcssfile = pxcssfile.replace(/\.map$/, '');
-  }
 
   var xcssfile = pxcssfile.replace(/(\.less)\.css$/, "$1");
   var renderOpt = {
@@ -19,18 +12,12 @@ module.exports = function (pxcssfile, reqOpt, param, cb) {
     compress: false,
     filename: xcssfile
   };
-  if (isMap || param._sourcemap) {
-    renderOpt.sourceMap = {
-      sourceMapBasepath: path.dirname(pxcssfile),
-      sourceMapURL: path.basename(pxcssfile) + ".map"
-    };
-  }
 
   var lesstext = helper.getUnicode(xcssfile);
   if (lesstext !== null) {
     less.render(lesstext, renderOpt, function (e, result) {
       if (!e) {
-        cb(e, (isMap ? result.map : result.css), xcssfile, (isMap ? "application/json" : MIME));
+        cb(e, result.css, xcssfile, MIME);
       }
       else {
         console.log(e);

@@ -15,7 +15,7 @@ module.exports = function (absPath, reqOpt, param, cb) {
   if (content === null) {
     cb({code: "PASS Engine"});
   }
-  else if (helper.matchPath(reqOpt.path.replace(/^\//, ''), param.target)) {
+  else if (helper.matchPath(require("path").relative('/', reqOpt.path), param.target)) {
     var babelOptions = helper.extend(BABEL_DEFAULT_OPTIONS, param.options);
     cb(null, babel.transform(content, babelOptions).code, absPath, "application/javascript");
   }
