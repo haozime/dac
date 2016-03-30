@@ -1,9 +1,9 @@
-var less = require("less");
-var helper = require("../lib/util");
-var plugins = require("../lib/less-plugins")(less);
-less.functions.functionRegistry.addMultiple(plugins.functions);
-
 module.exports = function (pxcssfile, reqOpt, param, cb) {
+  var less = require("less");
+  var helper = require("../lib/util");
+  var plugins = require("../lib/less-plugins")(less);
+  less.functions.functionRegistry.addMultiple(plugins.functions);
+  
   var MIME = "text/css";
 
   var xcssfile = pxcssfile.replace(/(\.less)\.css$/, "$1");

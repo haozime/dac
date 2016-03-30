@@ -1,10 +1,10 @@
-var helper = require("../lib/util");
-
-var ignoreText = function (content) {
-  return !/define\(/.test(content) && !/KISSY\./.test(content);
-};
-
 module.exports = function (absPath, reqOpt, param, cb) {
+  var helper = require("../lib/util");
+
+  var ignoreText = function (content) {
+    return !/define\(/.test(content) && !/KISSY\./.test(content);
+  };
+
   var content = typeof absPath == "object" ? absPath.content : helper.getUnicode(absPath);
 
   if (content === null) {

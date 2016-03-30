@@ -1,7 +1,7 @@
-var lessLayer = require("./less");
-var helper = require("../lib/util");
-
 module.exports = function (absPath, reqOpt, param, cb) {
+  var lessLayer = require("./less");
+  var helper = require("../lib/util");
+
   absPath = absPath.replace(/\.html$/, '');
 
   lessLayer(absPath, reqOpt, param, function (err, compiled, pxcssfile) {

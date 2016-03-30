@@ -1,16 +1,16 @@
-var lessLayer = require("./less");
-var CleanCSS = require("clean-css");
-var helper = require("../lib/util");
-
-var toString = function (compiled) {
-  var styles = new CleanCSS({compatibility:"ie7"}).minify(compiled).styles;
-  styles = styles.replace(/"|\\\d/g, function (all) {
-    return '\\' + all;
-  });
-  return '"' + styles + '"';
-};
-
 module.exports = function (absPath, reqOpt, param, cb) {
+  var lessLayer = require("./less");
+  var CleanCSS = require("clean-css");
+  var helper = require("../lib/util");
+
+  var toString = function (compiled) {
+    var styles = new CleanCSS({compatibility:"ie7"}).minify(compiled).styles;
+    styles = styles.replace(/"|\\\d/g, function (all) {
+      return '\\' + all;
+    });
+    return '"' + styles + '"';
+  };
+
   absPath = absPath.replace(/\.js$/, '');
 
   lessLayer(absPath, reqOpt, param, function (err, compiled, pxcssfile) {

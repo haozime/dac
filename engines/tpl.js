@@ -1,8 +1,8 @@
-var helper = require("../lib/util");
-var juicer = require("juicer");
-var pathLib = require("path");
-
 module.exports = function (htmljsfile, reqOpt, param, cb) {
+  var helper = require("../lib/util");
+  var juicer = require("juicer");
+  var pathLib = require("path");
+
   var MIME = "application/javascript";
 
   var htmlfile = htmljsfile.replace(/(\.html)\.js$|(\.tpl)\.js$/, "$1$2");
